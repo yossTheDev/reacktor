@@ -9,6 +9,8 @@
 		"preview": "vite preview"
 	},
 	"dependencies": {
+		"@capacitor/android": "^4.6.2",
+		"@capacitor/core": "^4.6.2",
 		"@codemirror/autocomplete": "^6.4.0",
 		"@codemirror/lang-javascript": "^6.1.2",
 		"@codemirror/language": "^6.4.0",
@@ -26,10 +28,13 @@
 		"react-dom": "^18.2.0",
 		"react-headless-tabs": "^6.0.3",
 		"react-live": "^3.1.1",
+		"react-movable": "^3.0.4",
 		"react-portal": "^4.2.2",
+		"styled-components": "^5.3.6",
 		"zustand": "^4.3.2"
 	},
 	"devDependencies": {
+		"@capacitor/cli": "^4.6.2",
 		"@tailwindcss/typography": "^0.5.8",
 		"@types/react": "^18.0.24",
 		"@types/react-dom": "^18.0.8",

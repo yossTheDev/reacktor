@@ -44,21 +44,35 @@ interface AppState {
 	currentIndex: number;
 	files: string[];
 	addFile: () => void;
-	saveFile?: () => void;
+	setIndex: (index: number) => void;
+	saveFile: (text: string) => void;
 }
 
 const useAppStore = create<AppState>((set) => ({
-	files: [''],
+	files: ['<p></p>'],
 	currentIndex: 0,
 	addFile: () =>
 		set((state) => ({
 			files: [...state.files, '<p></p>'],
+		})),
+
+	saveFile: (text) =>
+		set((state) => ({
+			files: state.files.map((item, index) =>
+				index === state.currentIndex ? text : item
+			),
+		})),
+
+	setIndex: (index) =>
+		set((state) => ({
+			currentIndex: index,
 		})),
 }));
 
 const Side: React.FC<{ className?: string }> = ({ className }) => {
 	const files = useAppStore((state) => state.files);
 	const addFile = useAppStore((state) => state.addFile);
+	const setIndex = useAppStore((state) => state.setIndex);
 
 	return (
 		<>
@@ -66,19 +80,29 @@ const Side: React.FC<{ className?: string }> = ({ className }) => {
 				className={`menu p-4 overflow-y-auto w-80 bg-base-100 text-base-content dark:bg-base-100  ${className}`}
 			>
 				<button onClick={() => addFile()}>Add</button>
-				{files.map((item, i) => (
-					<div key={i} className='flex w-64 flex-col  bg-base-100'>
-						<div className='dark:text-white'>Example FIle {item}</div>
-					</div>
-				))}
+
+				<div className='flex flex-auto flex-col gap-2'>
+					{files.map((item, i) => (
+						<div
+							onClick={() => setIndex(i)}
+							key={i}
+							className='flex w-64 flex-col  bg-base-200 select-none cursor-pointer p-2 rounded'
+						>
+							<div className=''>Workspace</div>
+						</div>
+					))}
+				</div>
 			</ul>
 		</>
 	);
 };
 
 function App() {
-	const [open, setOpen] = useState(true);
+	const [open, setOpen] = useState(false);
 	const [code, setCode] = useState('<div>Hello World!<div> Hola </div></div>');
+	const saveFile = useAppStore((state) => state.saveFile);
+	const currentIndex = useAppStore((state) => state.currentIndex);
+	const files = useAppStore((state) => state.files);
 
 	return (
 		<Drawer
@@ -86,7 +110,7 @@ function App() {
 			open={open}
 			side={<Side></Side>}
 		>
-			<LiveProvider code={code}>
+			<LiveProvider code={files[currentIndex]}>
 				<div
 					className='bg-base-100 h-screen w-screen flex flex-col flex-auto overflow-hidden text-gray-400'
 					id='main'
@@ -123,10 +147,12 @@ function App() {
 
 								<CodeMirror
 									className='flex flex-auto my-2 overflow-auto'
-									value={code}
+									value={files[currentIndex]}
 									width='100%'
 									extensions={[javascript({ jsx: true, typescript: true })]}
-									onChange={(e) => setCode(e)}
+									onChange={(e) => {
+										saveFile(e);
+									}}
 									basicSetup={{
 										autocompletion: true,
 										rectangularSelection: true,
