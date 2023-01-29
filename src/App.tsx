@@ -8,7 +8,8 @@ import { materialInit } from '@uiw/codemirror-theme-material';
 import { createTheme } from '@uiw/codemirror-themes';
 import { tags as t } from '@lezer/highlight';
 import { IconBug, IconCode, IconEye } from '@tabler/icons-react';
-import { create } from 'zustand';
+import { useAppStore } from './store/useAppStore';
+import { Side } from './components/Side';
 
 const myTheme = createTheme({
 	theme: 'light',
@@ -40,63 +41,6 @@ const myTheme = createTheme({
 	],
 });
 
-interface AppState {
-	currentIndex: number;
-	files: string[];
-	addFile: () => void;
-	setIndex: (index: number) => void;
-	saveFile: (text: string) => void;
-}
-
-const useAppStore = create<AppState>((set) => ({
-	files: ['<p></p>'],
-	currentIndex: 0,
-	addFile: () =>
-		set((state) => ({
-			files: [...state.files, '<p></p>'],
-		})),
-
-	saveFile: (text) =>
-		set((state) => ({
-			files: state.files.map((item, index) =>
-				index === state.currentIndex ? text : item
-			),
-		})),
-
-	setIndex: (index) =>
-		set((state) => ({
-			currentIndex: index,
-		})),
-}));
-
-const Side: React.FC<{ className?: string }> = ({ className }) => {
-	const files = useAppStore((state) => state.files);
-	const addFile = useAppStore((state) => state.addFile);
-	const setIndex = useAppStore((state) => state.setIndex);
-
-	return (
-		<>
-			<ul
-				className={`menu p-4 overflow-y-auto w-80 bg-base-100 text-base-content dark:bg-base-100  ${className}`}
-			>
-				<button onClick={() => addFile()}>Add</button>
-
-				<div className='flex flex-auto flex-col gap-2'>
-					{files.map((item, i) => (
-						<div
-							onClick={() => setIndex(i)}
-							key={i}
-							className='flex w-64 flex-col  bg-base-200 select-none cursor-pointer p-2 rounded'
-						>
-							<div className=''>Workspace</div>
-						</div>
-					))}
-				</div>
-			</ul>
-		</>
-	);
-};
-
 function App() {
 	const [open, setOpen] = useState(false);
 	const [code, setCode] = useState('<div>Hello World!<div> Hola </div></div>');
@@ -116,7 +60,7 @@ function App() {
 					id='main'
 				>
 					{/* Nav Bar */}
-					<Navbar className='flex shrink h-2 bg-base-100'>
+					<Navbar className='flex lg:hidden shrink h-2 bg-base-100'>
 						<Navbar.Start>
 							<p className='md:flex hidden dark:text-white font-bold text-black poppins-font-family ml-2 text-2xl select-none'>
 								Reacktor
@@ -133,7 +77,7 @@ function App() {
 					</Navbar>
 
 					{/* Content*/}
-					<div className='flex flex-auto flex-row overflow-hidden'>
+					<div className='flex flex-auto lg:mt-2 flex-row overflow-hidden'>
 						{/* File Browser */}
 						<Side className='relative w-24  lg:flex hidden shrink-0 grow-0'></Side>
 
@@ -169,13 +113,8 @@ function App() {
 								/>
 							</div>
 
-							<LiveEditor
-								className='bg-base-200/20  w-1/2 hidden'
-								onChange={(code) => setCode(code)}
-							/>
-
 							{/* Live Preview */}
-							<div className='flex flex-col w-1/2'>
+							<div className='flex flex-col shrink-0 w-1/2 overflow-auto'>
 								<div className='flex flex-auto flex-col'>
 									<div className='flex flex-row gap-1 mb-2 bg-base-200 p-3 rounded-2xl'>
 										<IconEye className='ml-2'></IconEye>

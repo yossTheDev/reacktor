@@ -7,6 +7,12 @@ module.exports = {
 
   plugins: [require('daisyui'), require('@tailwindcss/typography')],
 
+  safelist: [
+    {
+      pattern: /./, // the "." means "everything"
+      variants: ['hover:'] // you can add your variants here
+    }],
+
   // daisyUI config (optional)
   daisyui: {
     // themes: true,
